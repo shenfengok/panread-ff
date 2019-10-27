@@ -1,0 +1,36 @@
+{
+
+  "manifest_version": 2,
+  "name": "pan read for firefox",
+  "version": "1.0",
+
+  "description": "网盘阅读记录",
+  "homepage_url": "https://github.com/shenfengok/panread-ff",
+  "icons": {
+    "48": "icons/icon16.png"
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/icon16.png",
+    "default_title": "pan read",
+    "default_popup": "popup/flot.html"
+  },
+  "background": {
+    "scripts": [
+      "scripts/background.js"
+    ]
+  },
+    "content_scripts": [
+    {
+      "matches": ["*://pan.baidu.com/*"],
+      "js": ["scripts/jquery-3.3.1.min.js","scripts/include.js"]
+    }
+  ]
+
+
+
+}
