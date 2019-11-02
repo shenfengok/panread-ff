@@ -211,10 +211,26 @@ function save_last_viewed_item(item){
 		last_viewed_item.next = title_list[current+1]
 	}
 
-	chrome.runtime.sendMessage(last_viewed_item, function(response) {
-		console.log(response.farewell);
-	});
+	// chrome.runtime.sendMessage(last_viewed_item, function(response) {
+	// 	console.log(response.farewell);
+	// });
+
+	sending_msg(last_viewed_item);
 }
+
+function handleResponse(message) {
+  console.log(`Message from the background script:  ${message.response}`);
+}
+
+function handleError(error) {
+  console.log(`Error: ${error}`);
+}
+
+function sending_msg(msg) {
+  var sending = browser.runtime.sendMessage(msg);
+  sending.then(handleResponse, handleError);  
+}
+
 
 function get_title_list(item){
 	var title = item.attr('title')
@@ -257,22 +273,27 @@ function goto_item(item){
 }
 
 //events
-chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
-		console.log(request);
-		if( request.goto != undefined && request.goto !='' ) {
-			var route = request.goto;
+// chrome.runtime.onMessage.addListener(
+// 	function(request, sender, sendResponse) {
+// 		console.log(request);
 		
-			console.log(route.fix)
-			goto_item(route)
+// 	}
+// );
 
-		}else if( request.gotoNav != undefined && request.gotoNav !='' ) {
-			var route = request.gotoNav;
-			localStorage['last_route']  = route
-			window.location.reload();
-		}
+browser.runtime.onMessage.addListener(request => {
+    if( request.goto != undefined && request.goto !='' ) {
+		var route = request.goto;
+
+		console.log(route.fix)
+		goto_item(route)
+
+	}else if( request.gotoNav != undefined && request.gotoNav !='' ) {
+		var route = request.gotoNav;
+		localStorage['last_route']  = route
+		window.location.reload();
 	}
-);
+  return Promise.resolve({response: "Hi from content script"});
+});
 
 //helper funcs
 function do_job_steps(...steps) {

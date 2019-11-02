@@ -46,7 +46,7 @@ $('td a').bind('click',function () {
     var route = JSON.parse($(this).attr("route"))
     chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
         var activeTab = tabs[0];
-       chrome.tabs.sendMessage(activeTab.id, {"goto": route});
+       browser.tabs.sendMessage(activeTab.id, {"goto": route});
     });
 })
 
@@ -56,23 +56,44 @@ $('td span').bind('click',function () {
     refreshTable();
 })
 
+function onError(error) {
+  console.error(`Error: ${error}`);
+}
+
+
+
 $('tr a').bind('click',function () {
     var fix = $(this).attr("fix")
     var msg = {"gotoNav": fix};
-    chrome.tabs.query({url: 'https://pan.baidu.com/*'}, function (tabs){
-       
-        var activeTab = tabs[0];
+    var sendMessageToTabs = function (tabs) {
+      for (let tab of tabs) {
+        browser.tabs.sendMessage(
+          tab.id,
+          msg
+        ).then(response => {
+          console.log("Message from the content script:");
+          console.log(response.response);
+        }).catch(onError);
+      }
+    }
 
-        if(activeTab == undefined){
-            chrome.tabs.create( {active: true,url: 'https://pan.baidu.com/mbox/homepage#share/type=session'}, function (tab){
-                chrome.tabs.sendMessage(tab.id,msg)
-            })
-        }else{
-            chrome.tabs.update(activeTab.id, {active: true}, function (tab){
-                chrome.tabs.sendMessage(tab.id,msg)
-            })
-        }
+
+    browser.tabs.query({currentWindow: true, active: true}).then(sendMessageToTabs).catch(onError);
+
+    // chrome.tabs.query({url: 'https://pan.baidu.com/*'}, function (tabs){
+       
+    //     var activeTab = tabs[0];
+
+    //     if(activeTab == undefined){
+    //         chrome.tabs.create( {active: true,url: 'https://pan.baidu.com/mbox/homepage#share/type=session'}, function (tab){
+    //             chrome.tabs.sendMessage(tab.id,msg)
+    //         })
+    //     }else{
+    //         chrome.tabs.update(activeTab.id, {active: true}, function (tab){
+    //             chrome.tabs.sendMessage(tab.id,msg)
+    //         })
+    //     }
         
-    });
+    // });
 })
 

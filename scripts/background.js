@@ -15,3 +15,13 @@ chrome.runtime.onMessage.addListener(
 //         console.log(response.farewell);
 //     });
 // });
+
+
+function handleMessage(request, sender, sendResponse) {
+    console.log(request)
+        localStorage['item'+ request.series] = JSON.stringify(request)
+        localStorage['new_item_coming'] = '1'
+  sendResponse({response: "Response from background script"});
+}
+
+browser.runtime.onMessage.addListener(handleMessage);
